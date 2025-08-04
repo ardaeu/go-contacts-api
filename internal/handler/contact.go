@@ -19,6 +19,11 @@ func ContactCreateHandler(c *gin.Context) {
 		return
 	}
 
+	if err := newContact.Validate(); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	newContact.ID = currentID
 	currentID++
 	contacts = append(contacts, newContact)
@@ -61,6 +66,11 @@ func ContactUpdateHandler(c *gin.Context) {
 	var updatedData model.Contact
 	if err := c.ShouldBindJSON(&updatedData); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Geçersiz veri"})
+		return
+	}
+
+	if err := updatedData.Validate(); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
