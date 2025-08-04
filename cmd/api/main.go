@@ -16,5 +16,7 @@ func main() {
 
 	r.GET("/contacts/:id", handler.ContactGetByIDHandler)
 
-	r.Run(":8081")
+	r.PUT("/contacts/:id", handler.ContactUpdateHandler)
+
+	r.Run(":8082")
 }

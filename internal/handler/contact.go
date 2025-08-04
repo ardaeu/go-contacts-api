@@ -48,3 +48,32 @@ func ContactGetByIDHandler(c *gin.Context) {
 
 	c.JSON(http.StatusNotFound, gin.H{"error": "Kişi bulunamadı"})
 }
+
+func ContactUpdateHandler(c *gin.Context) {
+	idParam := c.Param("id")
+
+	id, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Geçersiz ID"})
+		return
+	}
+
+	var updatedData model.Contact
+	if err := c.ShouldBindJSON(&updatedData); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Geçersiz veri"})
+		return
+	}
+
+	for i, contact := range contacts {
+		if contact.ID == id {
+			contacts[i].Name = updatedData.Name
+			contacts[i].Email = updatedData.Email
+			contacts[i].Phone = updatedData.Phone
+
+			c.JSON(http.StatusOK, contacts[i])
+			return
+		}
+	}
+
+	c.JSON(http.StatusNotFound, gin.H{"error": "Kişi bulunamadı"})
+}
