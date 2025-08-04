@@ -14,5 +14,7 @@ func main() {
 
 	r.GET("/contacts", handler.ContactListHandler)
 
-	r.Run()
+	r.GET("/contacts/:id", handler.ContactGetByIDHandler)
+
+	r.Run(":8081")
 }
