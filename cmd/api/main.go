@@ -17,9 +17,8 @@ func main() {
 	config.ConnectDB()
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
-		dbURL = "postgres://myuser:mypassword@localhost:5432/contacts_db?sslmode=disable"
+		log.Fatal("DATABASE_URL environment variable is not set")
 	}
-
 	config, err := pgxpool.ParseConfig(dbURL)
 	if err != nil {
 		log.Fatal("pgx config hatası:", err)
