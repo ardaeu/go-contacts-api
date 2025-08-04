@@ -1,24 +1,34 @@
 package main
 
 import (
-	"github.com/ardaeu/go-contacts-api/internal/handler"
-	"github.com/gin-gonic/gin"
+	"log"
+	"net/http"
+
+	"github.com/ardaeu/contact-api/config"
+	"github.com/ardaeu/contact-api/handler"
+	"github.com/go-chi/chi/v5"
 )
 
 func main() {
-	r := gin.Default()
+	// 1. Veritabanı bağlantısını başlat
+	config.ConnectDB()
 
-	r.GET("/ping", handler.PingHandler)
+	// 2. Router oluştur
+	r := chi.NewRouter()
 
-	r.POST("/contacts", handler.ContactCreateHandler)
+	// 3. Contact handler'ı başlat
+	contactHandler := handler.NewContactHandler()
 
-	r.GET("/contacts", handler.ContactListHandler)
+	// 4. Route'ları tanımla
+	r.Route("/contacts", func(r chi.Router) {
+		r.Post("/", contactHandler.CreateContact)
+		r.Get("/", contactHandler.GetAllContacts)
+		r.Get("/{id}", contactHandler.GetContactByID)
+		r.Put("/{id}", contactHandler.UpdateContact)
+		r.Delete("/{id}", contactHandler.DeleteContact)
+	})
 
-	r.GET("/contacts/:id", handler.ContactGetByIDHandler)
-
-	r.PUT("/contacts/:id", handler.ContactUpdateHandler)
-
-	r.DELETE("/contacts/:id", handler.ContactDeleteHandler)
-
-	r.Run(":8085")
+	// 5. Sunucuyu başlat
+	log.Println("Sunucu http://localhost:8080 adresinde çalışıyor")
+	http.ListenAndServe(":8080", r)
 }
