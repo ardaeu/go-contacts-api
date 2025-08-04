@@ -77,3 +77,23 @@ func ContactUpdateHandler(c *gin.Context) {
 
 	c.JSON(http.StatusNotFound, gin.H{"error": "Kişi bulunamadı"})
 }
+
+func ContactDeleteHandler(c *gin.Context) {
+	idParam := c.Param("id")
+
+	id, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Geçersiz ID"})
+		return
+	}
+
+	for i, contact := range contacts {
+		if contact.ID == id {
+			contacts = append(contacts[:i], contacts[i+1:]...)
+			c.JSON(http.StatusOK, gin.H{"message": "Kişi silindi"})
+			return
+		}
+	}
+
+	c.JSON(http.StatusNotFound, gin.H{"error": "Kişi bulunamadı"})
+}

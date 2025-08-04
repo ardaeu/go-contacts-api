@@ -18,5 +18,7 @@ func main() {
 
 	r.PUT("/contacts/:id", handler.ContactUpdateHandler)
 
-	r.Run(":8082")
+	r.DELETE("/contacts/:id", handler.ContactDeleteHandler)
+
+	r.Run(":8085")
 }
