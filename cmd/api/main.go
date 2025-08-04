@@ -1,31 +1,39 @@
 package main
 
 import (
-	"database/sql"
+	"context"
 	"log"
 	"net/http"
 	"os"
 
+	"github.com/ardaeu/go-contacts-api/config"
 	"github.com/ardaeu/go-contacts-api/internal/handler"
 	"github.com/ardaeu/go-contacts-api/internal/storage"
 	"github.com/go-chi/chi/v5"
-	_ "github.com/lib/pq"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func main() {
+	config.ConnectDB()
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
-		dbURL = "postgres://postgres:postgres@localhost:5432/go_contacts?sslmode=disable"
+		dbURL = "postgres://myuser:mypassword@localhost:5432/contacts_db?sslmode=disable"
 	}
 
-	db, err := sql.Open("postgres", dbURL)
+	config, err := pgxpool.ParseConfig(dbURL)
 	if err != nil {
-		log.Fatalf("DB bağlantı hatası: %v", err)
+		log.Fatal("pgx config hatası:", err)
 	}
-	defer db.Close()
 
-	store := storage.NewPGStore(db)
-	h := &handler.ContactHandler{Store: store}
+	dbpool, err := pgxpool.NewWithConfig(context.Background(), config)
+	if err != nil {
+		log.Fatal("pgx pool oluşturulamadı:", err)
+	}
+	defer dbpool.Close()
+
+	store := storage.NewPGStore()
+
+	h := handler.ContactHandler{Store: store}
 
 	r := chi.NewRouter()
 
@@ -35,7 +43,6 @@ func main() {
 	r.Put("/contacts/{id}", h.UpdateContact)
 	r.Delete("/contacts/{id}", h.DeleteContact)
 
-	// Sunucuyu başlat
-	log.Println("Sunucu http://localhost:8080 adresinde başlatıldı...")
-	http.ListenAndServe(":8080", r)
+	log.Println("Sunucu http://localhost:8088 adresinde başladı")
+	http.ListenAndServe(":8088", r)
 }

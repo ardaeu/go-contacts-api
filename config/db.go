@@ -13,7 +13,9 @@ import (
 var DB *pgxpool.Pool
 
 func ConnectDB() {
-	err := godotenv.Load()
+	var err error
+
+	err = godotenv.Load()
 	if err != nil {
 		log.Fatal("'.env' dosyası yüklenemedi")
 	}
@@ -37,5 +39,5 @@ func ConnectDB() {
 		log.Fatalf("Veritabanına erişilemiyor: %v", err)
 	}
 
-	fmt.Println("✅ Veritabanına bağlanıldı.")
+	fmt.Println("Veritabanına bağlanıldı.")
 }

@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/ardaeu/go-contacts-api/internal/model"
 	"github.com/ardaeu/go-contacts-api/internal/storage"
@@ -40,7 +41,12 @@ func (h *ContactHandler) GetAllContacts(w http.ResponseWriter, r *http.Request) 
 }
 
 func (h *ContactHandler) GetContactByID(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
+	idStr := chi.URLParam(r, "id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		http.Error(w, "Geçersiz ID formatı", http.StatusBadRequest)
+		return
+	}
 
 	contact, err := h.Store.GetByID(r.Context(), id)
 	if err != nil {
@@ -56,7 +62,12 @@ func (h *ContactHandler) GetContactByID(w http.ResponseWriter, r *http.Request) 
 }
 
 func (h *ContactHandler) UpdateContact(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
+	idStr := chi.URLParam(r, "id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		http.Error(w, "Geçersiz ID formatı", http.StatusBadRequest)
+		return
+	}
 
 	var c model.Contact
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
@@ -78,7 +89,12 @@ func (h *ContactHandler) UpdateContact(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *ContactHandler) DeleteContact(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
+	idStr := chi.URLParam(r, "id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		http.Error(w, "Geçersiz ID formatı", http.StatusBadRequest)
+		return
+	}
 
 	if err := h.Store.Delete(r.Context(), id); err != nil {
 		if err == storage.ErrNotFound {

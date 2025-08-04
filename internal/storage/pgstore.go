@@ -3,11 +3,11 @@ package storage
 import (
 	"context"
 	"errors"
+	"log"
 	"time"
 
 	"github.com/ardaeu/go-contacts-api/config"
 	"github.com/ardaeu/go-contacts-api/internal/model"
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -25,16 +25,17 @@ func NewPGStore() *PGStore {
 }
 
 func (p *PGStore) Create(ctx context.Context, c *model.Contact) error {
-	c.ID = uuid.New().String()
 	now := time.Now()
 
-	_, err := p.db.Exec(ctx,
-		`INSERT INTO contacts (id, name, email, phone, created_at, updated_at)
-		 VALUES ($1, $2, $3, $4, $5, $6)`,
-		c.ID, c.Name, c.Email, c.Phone, now, now,
-	)
+	query := `INSERT INTO contacts (name, email, phone, created_at, updated_at) VALUES ($1, $2, $3, $4, $5) RETURNING id`
 
-	return err
+	err := p.db.QueryRow(ctx, query, c.Name, c.Email, c.Phone, now, now).Scan(&c.ID)
+	if err != nil {
+		log.Println("Create hata:", err)
+		return err
+	}
+
+	return nil
 }
 
 func (p *PGStore) GetAll(ctx context.Context) ([]model.Contact, error) {
@@ -57,7 +58,7 @@ func (p *PGStore) GetAll(ctx context.Context) ([]model.Contact, error) {
 	return contacts, nil
 }
 
-func (p *PGStore) GetByID(ctx context.Context, id string) (*model.Contact, error) {
+func (p *PGStore) GetByID(ctx context.Context, id int64) (*model.Contact, error) {
 	row := p.db.QueryRow(ctx, `SELECT id, name, email, phone FROM contacts WHERE id=$1`, id)
 
 	var c model.Contact
@@ -90,7 +91,7 @@ func (p *PGStore) Update(ctx context.Context, c *model.Contact) error {
 	return nil
 }
 
-func (p *PGStore) Delete(ctx context.Context, id string) error {
+func (p *PGStore) Delete(ctx context.Context, id int64) error {
 	cmdTag, err := p.db.Exec(ctx, `DELETE FROM contacts WHERE id=$1`, id)
 	if err != nil {
 		return err
