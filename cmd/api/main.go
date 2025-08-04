@@ -10,5 +10,7 @@ func main() {
 
 	r.GET("/ping", handler.PingHandler)
 
+	r.POST("/contacts", handler.ContactCreateHandler)
+
 	r.Run()
 }
