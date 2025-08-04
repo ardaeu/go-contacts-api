@@ -12,5 +12,7 @@ func main() {
 
 	r.POST("/contacts", handler.ContactCreateHandler)
 
+	r.GET("/contacts", handler.ContactListHandler)
+
 	r.Run()
 }

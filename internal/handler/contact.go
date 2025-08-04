@@ -24,3 +24,7 @@ func ContactCreateHandler(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, newContact)
 }
+
+func ContactListHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, contacts)
+}
