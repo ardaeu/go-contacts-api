@@ -14,10 +14,10 @@ Bu proje Go dili ile geliştirilmiş basit bir RESTful API'dir. PostgreSQL veri 
 
 ## Teknolojiler
 
-- Go 1.20+
+- Go
 - PostgreSQL
 - Chi Router
-- go.mod modülleri: github.com/go-chi/chi, github.com/lib/pq, github.com/google/uuid (eğer kullanıldı)
+- go.mod modülleri: github.com/go-chi/chi, github.com/lib/pq, github.com/google/uuid
 
 ## Kurulum ve Çalıştırma
 
@@ -37,7 +37,7 @@ Bu proje Go dili ile geliştirilmiş basit bir RESTful API'dir. PostgreSQL veri 
    ```
 4. Projeyi klonla:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/ardaeu/go-contacts-api.git
    cd go-contacts-api
    ```
 5. Modülleri indir:
@@ -85,10 +85,6 @@ Kayıt sil:
 ```bash
 curl -X DELETE http://localhost:8088/contacts/1
 ```
-
-## Lisans
-
-MIT License
 
 ## İletişim
 
